@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from 'url';
@@ -27,11 +28,6 @@ async function startServer() {
 
       const ai = new GoogleGenAI({
         apiKey: apiKey,
-        httpOptions: {
-          headers: {
-            'User-Agent': 'aistudio-build',
-          }
-        }
       });
 
       const systemInstruction = `
@@ -56,9 +52,18 @@ async function startServer() {
       });
 
       res.json({ summary: response.text });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error calling Gemini API:", error);
-      res.status(500).json({ error: "Failed to generate summary" });
+      
+      let errorMessage = "伺服器正忙\n請等一下再試\n\n錯誤細節：\n";
+      if (error instanceof Error) {
+        errorMessage += error.message;
+      } else {
+        errorMessage += String(error);
+      }
+
+      const status = error?.status || 500;
+      res.status(status).json({ error: errorMessage });
     }
   });
 
