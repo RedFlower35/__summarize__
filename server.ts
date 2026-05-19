@@ -28,13 +28,7 @@ async function startServer() {
         return res.status(500).json({ error: "Server configuration error: Missing API Key" });
       }
 
-<<<<<<< HEAD
       const ai = new GoogleGenAI({ apiKey });
-=======
-      const ai = new GoogleGenAI({
-        apiKey: apiKey,
-      });
->>>>>>> b6f782ab9b395ce40876d1f303df52213e60b120
 
       const systemInstruction = `
         你是一位專業的會議記錄助理。請根據使用者提供的會議逐字稿，整理出結構化的會議紀錄。
