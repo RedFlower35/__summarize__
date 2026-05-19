@@ -1,14 +1,17 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = typeof __filename !== "undefined"
+  ? path.dirname(__filename)
+  : path.dirname(fileURLToPath(import.meta.url));
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT || 3000;
 
   app.use(express.json());
 
@@ -25,14 +28,7 @@ async function startServer() {
         return res.status(500).json({ error: "Server configuration error: Missing API Key" });
       }
 
-      const ai = new GoogleGenAI({
-        apiKey: apiKey,
-        httpOptions: {
-          headers: {
-            'User-Agent': 'aistudio-build',
-          }
-        }
-      });
+      const ai = new GoogleGenAI({ apiKey });
 
       const systemInstruction = `
         你是一位專業的會議記錄助理。請根據使用者提供的會議逐字稿，整理出結構化的會議紀錄。
@@ -48,7 +44,7 @@ async function startServer() {
       `;
 
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-2.5-flash",
         contents: transcript,
         config: {
           systemInstruction: systemInstruction,
